@@ -25,7 +25,7 @@ def encrypt_message(a, b, original_message)
   encrypted_message = ''
 
   original_message.downcase.split('').each do |c|
-    encrypted_message += if chars_to_encrypt.include? c then ((((c.ord - 'a'.ord) * a + b) % 26) + 'a'.ord).chr else c end
+    encrypted_message += if chars_to_encrypt.include? c then ((((c.ord - 'a'.ord).abs * a + b) % 26) + 'a'.ord).chr else c end
   end
 
   return encrypted_message.upcase
@@ -40,19 +40,16 @@ def decrypt_message(encrypted_message)
       message = ''
 
       encrypted_message.downcase.split('').each do |c|
-        message += if chars_to_decrypt.include? c then ((((c.ord - 'a'.ord - b).abs * a) % 26) + 'a'.ord).chr else c end
+        message += if chars_to_decrypt.include? c then ((((c.ord - 'a'.ord).abs * a + b) % 26) + 'a'.ord).chr else c end
       end
 
-      all_messages[message] = [score_message(message), a, b]
+      all_messages[message] = score_message(message)
     end
   end
 
-  sorted_messages = all_messages.keys.sort_by { |msg| all_messages[msg][0] }
+  sorted_messages = all_messages.keys.sort_by { |msg| all_messages[msg] }
 
-  msg = sorted_messages[-1]
-  a, b = all_messages[msg][1], all_messages[msg][2]
-  
-  return '(%d, %d) => "%s"' % [a, b, msg]
+  return sorted_messages[-1]
 end
 
 def score_message(message)
